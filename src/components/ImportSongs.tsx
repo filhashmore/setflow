@@ -164,8 +164,42 @@ function parseCsv(csv: string): string[][] {
   return data;
 }
 
+// Check if a row looks like a header row
+function isHeaderRow(row: string[]): boolean {
+  const [title, shortName, duration, bpm, musicalKey, energyLevel] = row.map(s => s?.toLowerCase().trim() || '');
+
+  // Common header patterns
+  const headerPatterns = [
+    // Check title column
+    ['song title', 'title', 'name', 'song', 'track', 'song name'],
+    // Check duration column
+    ['duration', 'length', 'time'],
+    // Check bpm column
+    ['bpm', 'tempo'],
+    // Check key column
+    ['musical key', 'key', 'root', 'scale'],
+    // Check energy column
+    ['energy level', 'energy', 'intensity'],
+  ];
+
+  // If multiple columns match header patterns, it's likely a header
+  let headerMatches = 0;
+  if (headerPatterns[0].some(p => title.includes(p))) headerMatches++;
+  if (headerPatterns[1].some(p => duration?.includes(p))) headerMatches++;
+  if (headerPatterns[2].some(p => bpm?.includes(p))) headerMatches++;
+  if (headerPatterns[3].some(p => musicalKey?.includes(p))) headerMatches++;
+  if (headerPatterns[4].some(p => energyLevel?.includes(p))) headerMatches++;
+
+  return headerMatches >= 2;
+}
+
 // Validate and convert parsed row to song data
-function validateRow(row: string[]): ParsedSong {
+function validateRow(row: string[]): ParsedSong | null {
+  // Skip header rows
+  if (isHeaderRow(row)) {
+    return null;
+  }
+
   const [title, shortName, duration, bpm, musicalKey, energyLevel, lightsNotes, notes] = row;
 
   const errors: string[] = [];
@@ -270,7 +304,7 @@ export function ImportSongs({ onImport }: ImportSongsProps) {
       }
     }
 
-    const parsed = rows.map(validateRow);
+    const parsed = rows.map(validateRow).filter((s): s is ParsedSong => s !== null);
     setParsedSongs(parsed);
     setStep('preview');
   };

@@ -19,7 +19,7 @@ interface SongPickerProps {
   lastSongInSetlist?: Song | null;
 }
 
-type SortOption = 'title' | 'bpm' | 'energy' | 'duration' | 'key';
+type SortOption = 'added' | 'title' | 'bpm' | 'energy' | 'duration' | 'key';
 
 export function SongPicker({
   songs,
@@ -30,7 +30,7 @@ export function SongPicker({
 }: SongPickerProps) {
   const [open, setOpen] = useState(false);
   const [search, setSearch] = useState('');
-  const [sortBy, setSortBy] = useState<SortOption>('title');
+  const [sortBy, setSortBy] = useState<SortOption>('added');
   const isDesktop = useMediaQuery('(min-width: 768px)');
 
   // Filter and sort songs
@@ -49,6 +49,8 @@ export function SongPicker({
     // Sort
     result.sort((a, b) => {
       switch (sortBy) {
+        case 'added':
+          return a.createdAt - b.createdAt; // Oldest first (import order)
         case 'title':
           return a.title.localeCompare(b.title);
         case 'bpm':
@@ -135,6 +137,7 @@ export function SongPicker({
         {/* Sort options */}
         <div className="flex items-center gap-1.5 overflow-x-auto pb-1 -mx-1 px-1">
           {([
+            { value: 'added', label: 'Import' },
             { value: 'title', label: 'A-Z' },
             { value: 'bpm', label: 'BPM' },
             { value: 'energy', label: 'Energy' },
