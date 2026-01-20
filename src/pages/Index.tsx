@@ -12,7 +12,9 @@ import {
   ChevronRight
 } from 'lucide-react';
 import { SongForm } from '@/components/SongForm';
+import type { SongFormData } from '@/components/SongForm';
 import { SongCard } from '@/components/SongCard';
+import { ImportSongs } from '@/components/ImportSongs';
 import { SetlistBuilder } from '@/components/SetlistBuilder';
 import { ExportView } from '@/components/ExportView';
 import { TimeDisplay } from '@/components/TimeDisplay';
@@ -64,6 +66,12 @@ export default function Index() {
   const handleAddSong = useCallback((songData: Omit<Song, 'id' | 'createdAt' | 'updatedAt'>) => {
     addSong(songData);
     setSongFormOpen(false);
+  }, [addSong]);
+
+  const handleImportSongs = useCallback((songsData: SongFormData[]) => {
+    songsData.forEach(songData => {
+      addSong(songData);
+    });
   }, [addSong]);
 
   const handleEditSong = useCallback((songData: Omit<Song, 'id' | 'createdAt' | 'updatedAt'>) => {
@@ -192,10 +200,13 @@ export default function Index() {
                   {songs.length} {songs.length === 1 ? 'song' : 'songs'}
                 </p>
               </div>
-              <Button onClick={() => setSongFormOpen(true)} size="sm" className="gap-1.5 h-9 shadow-sm">
-                <Plus className="h-4 w-4" />
-                <span className="hidden xs:inline">Add</span> Song
-              </Button>
+              <div className="flex items-center gap-2">
+                <ImportSongs onImport={handleImportSongs} />
+                <Button onClick={() => setSongFormOpen(true)} size="sm" className="gap-1.5 h-9 shadow-sm">
+                  <Plus className="h-4 w-4" />
+                  <span className="hidden xs:inline">Add</span> Song
+                </Button>
+              </div>
             </div>
 
             {songs.length === 0 ? (
@@ -205,12 +216,15 @@ export default function Index() {
                 </div>
                 <h3 className="mb-2 font-semibold">No songs yet</h3>
                 <p className="mb-5 text-center text-sm text-muted-foreground max-w-[240px]">
-                  Add your first song to start building setlists
+                  Add your first song or import from a spreadsheet
                 </p>
-                <Button onClick={() => setSongFormOpen(true)} className="gap-2 shadow-sm">
-                  <Plus className="h-4 w-4" />
-                  Add Your First Song
-                </Button>
+                <div className="flex flex-wrap items-center justify-center gap-2">
+                  <Button onClick={() => setSongFormOpen(true)} className="gap-2 shadow-sm">
+                    <Plus className="h-4 w-4" />
+                    Add Your First Song
+                  </Button>
+                  <ImportSongs onImport={handleImportSongs} />
+                </div>
               </div>
             ) : (
               <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">

@@ -120,7 +120,7 @@ export function SongForm({ song, onSubmit, onCancel }: SongFormProps) {
   return (
     <form onSubmit={handleSubmit} className="space-y-5 pb-2">
       {/* Header */}
-      <div className="flex items-center gap-2 pb-3 border-b border-border sticky top-0 bg-card z-10">
+      <div className="flex items-center gap-2 pb-3 border-b border-border">
         <Music className="w-5 h-5 text-primary" />
         <h2 className="text-lg font-semibold text-foreground">
           {isEditing ? 'Edit Song' : 'Add Song'}
