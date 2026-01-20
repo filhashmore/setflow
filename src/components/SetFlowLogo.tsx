@@ -8,41 +8,39 @@ interface SetFlowLogoProps {
 
 export function SetFlowLogo({ className, size = 'md', showText = true }: SetFlowLogoProps) {
   const sizes = {
-    sm: { icon: 'w-8 h-8', text: 'text-base', bars: 'gap-0.5' },
-    md: { icon: 'w-10 h-10', text: 'text-lg', bars: 'gap-0.5' },
-    lg: { icon: 'w-14 h-14', text: 'text-2xl', bars: 'gap-1' },
+    sm: { icon: 'w-8 h-8', text: 'text-base', iconSize: 16 },
+    md: { icon: 'w-10 h-10', text: 'text-lg', iconSize: 20 },
+    lg: { icon: 'w-14 h-14', text: 'text-2xl', iconSize: 28 },
   };
 
   const s = sizes[size];
 
   return (
     <div className={cn('flex items-center gap-3', className)}>
-      {/* Logo Icon - Stylized waveform/equalizer bars forming an "S" flow */}
+      {/* Logo Icon - Document outline on themed background */}
       <div className={cn(
-        'relative flex items-end justify-center rounded-xl bg-gradient-to-br from-primary via-primary to-accent p-2 shadow-lg',
+        'relative flex items-center justify-center rounded-xl bg-primary/10 p-2 shadow-sm border border-primary/20',
         s.icon
       )}>
-        {/* Flowing bars representing music/setlist flow */}
-        <div className={cn('flex items-end', s.bars)}>
-          <div className="w-1 bg-white/90 rounded-full animate-pulse" style={{ height: '35%', animationDelay: '0ms' }} />
-          <div className="w-1 bg-white/90 rounded-full animate-pulse" style={{ height: '70%', animationDelay: '100ms' }} />
-          <div className="w-1 bg-white/90 rounded-full animate-pulse" style={{ height: '50%', animationDelay: '200ms' }} />
-          <div className="w-1 bg-white/90 rounded-full animate-pulse" style={{ height: '85%', animationDelay: '300ms' }} />
-          <div className="w-1 bg-white/90 rounded-full animate-pulse" style={{ height: '40%', animationDelay: '400ms' }} />
-        </div>
-        {/* Subtle flow arrow overlay */}
+        {/* Document icon - black outline */}
         <svg
-          className="absolute inset-0 w-full h-full opacity-20"
-          viewBox="0 0 40 40"
+          width={s.iconSize}
+          height={s.iconSize}
+          viewBox="0 0 24 24"
           fill="none"
+          stroke="currentColor"
+          strokeWidth="1.5"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          className="text-foreground"
         >
-          <path
-            d="M10 30 Q20 20 30 25 Q35 27 35 20 Q35 13 25 15 Q15 17 20 10"
-            stroke="white"
-            strokeWidth="2"
-            strokeLinecap="round"
-            fill="none"
-          />
+          {/* Document shape */}
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+          {/* Folded corner */}
+          <polyline points="14 2 14 8 20 8" />
+          {/* Lines representing setlist */}
+          <line x1="8" y1="13" x2="16" y2="13" />
+          <line x1="8" y1="17" x2="14" y2="17" />
         </svg>
       </div>
 

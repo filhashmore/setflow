@@ -1,0 +1,29 @@
+<svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Papyrus background - full bleed for maskable -->
+  <rect width="512" height="512" fill="#E8DCC4"/>
+
+  <!-- Document icon - centered with safe zone padding (20% on each side) -->
+  <g transform="translate(140, 102)">
+    <path
+      d="M144 12H60a24 24 0 0 0-24 24v216a24 24 0 0 0 24 24h120a24 24 0 0 0 24-24V72z"
+      stroke="#1a1a1a"
+      stroke-width="18"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+      fill="none"
+    />
+    <!-- Folded corner -->
+    <polyline
+      points="144 12 144 72 204 72"
+      stroke="#1a1a1a"
+      stroke-width="18"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+      fill="none"
+    />
+    <!-- Lines representing setlist -->
+    <line x1="72" y1="132" x2="168" y2="132" stroke="#1a1a1a" stroke-width="18" stroke-linecap="round"/>
+    <line x1="72" y1="180" x2="144" y2="180" stroke="#1a1a1a" stroke-width="18" stroke-linecap="round"/>
+    <line x1="72" y1="228" x2="120" y2="228" stroke="#1a1a1a" stroke-width="18" stroke-linecap="round"/>
+  </g>
+</svg>
