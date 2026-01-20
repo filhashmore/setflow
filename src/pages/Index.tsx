@@ -21,6 +21,7 @@ import { TimeDisplay } from '@/components/TimeDisplay';
 import { SetlistSettings } from '@/components/SetlistSettings';
 import { SetFlowLogo } from '@/components/SetFlowLogo';
 import { AppearanceSettingsSheet, useAppearance } from '@/components/AppearanceSettings';
+import { SongPicker } from '@/components/SongPicker';
 import { cn } from '@/lib/utils';
 
 type View = 'library' | 'setlist';
@@ -39,7 +40,17 @@ export default function Index() {
 
   const { settings: appearanceSettings, updateAccentColor } = useAppearance();
 
-  const [currentView, setCurrentView] = useState<View>('library');
+  // Default to setlist view if user has songs (returning user), otherwise library
+  const [currentView, setCurrentView] = useState<View>(() => {
+    // Check localStorage directly for initial state to avoid flash
+    try {
+      const storedSongs = localStorage.getItem('setflow-songs');
+      const hasSongs = storedSongs && JSON.parse(storedSongs).length > 0;
+      return hasSongs ? 'setlist' : 'library';
+    } catch {
+      return 'library';
+    }
+  });
   const [songFormOpen, setSongFormOpen] = useState(false);
   const [editingSong, setEditingSong] = useState<Song | null>(null);
   const [showExport, setShowExport] = useState(false);
@@ -270,12 +281,21 @@ export default function Index() {
                 {/* Setlist Header with Time Display */}
                 <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
                   <div className="flex-1 min-w-0">
-                    <input
-                      type="text"
-                      value={activeSetlist.name}
-                      onChange={(e) => updateSetlist(activeSetlist.id, { name: e.target.value })}
-                      className="w-full bg-transparent text-lg sm:text-xl font-semibold outline-none focus:ring-2 focus:ring-primary/50 rounded px-1 -ml-1 truncate"
-                    />
+                    <div className="flex items-center gap-3">
+                      <input
+                        type="text"
+                        value={activeSetlist.name}
+                        onChange={(e) => updateSetlist(activeSetlist.id, { name: e.target.value })}
+                        className="flex-1 min-w-0 bg-transparent text-lg sm:text-xl font-semibold outline-none focus:ring-2 focus:ring-primary/50 rounded px-1 -ml-1 truncate"
+                      />
+                      <SongPicker
+                        songs={songs}
+                        setlistSongIds={activeSetlist.songIds}
+                        onAddSong={handleAddToSetlist}
+                        onRemoveSong={handleRemoveFromSetlist}
+                        lastSongInSetlist={setlistSongs.length > 0 ? setlistSongs[setlistSongs.length - 1] : null}
+                      />
+                    </div>
                     <p className="text-sm text-muted-foreground mt-1">
                       {setlistSongs.length} {setlistSongs.length === 1 ? 'song' : 'songs'} • {formatDuration(totalSeconds)}
                     </p>
@@ -308,15 +328,13 @@ export default function Index() {
                     <p className="mb-3 text-sm text-muted-foreground">
                       Your setlist is empty
                     </p>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => setCurrentView('library')}
-                      className="gap-2"
-                    >
-                      Go to Library
-                      <ChevronRight className="h-4 w-4" />
-                    </Button>
+                    <SongPicker
+                      songs={songs}
+                      setlistSongIds={activeSetlist.songIds}
+                      onAddSong={handleAddToSetlist}
+                      onRemoveSong={handleRemoveFromSetlist}
+                      lastSongInSetlist={null}
+                    />
                   </div>
                 ) : (
                   <SetlistBuilder

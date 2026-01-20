@@ -301,26 +301,6 @@ export function SongForm({ song, onSubmit, onCancel }: SongFormProps) {
         </div>
       </div>
 
-      {/* Notes */}
-      <div className="space-y-2">
-        <Label
-          htmlFor="notes"
-          className="text-sm font-medium text-foreground flex items-center gap-1.5"
-        >
-          <FileText className="w-4 h-4 text-muted-foreground" />
-          Notes
-          <span className="text-muted-foreground font-normal">(optional)</span>
-        </Label>
-        <Textarea
-          id="notes"
-          value={notes}
-          onChange={(e) => setNotes(e.target.value)}
-          placeholder="Add any notes about this song..."
-          className="min-h-[80px] bg-secondary border-border focus:border-primary focus:ring-primary resize-none"
-          rows={2}
-        />
-      </div>
-
       {/* Lights Notes */}
       <div className="space-y-2">
         <Label
@@ -336,6 +316,26 @@ export function SongForm({ song, onSubmit, onCancel }: SongFormProps) {
           value={lightsNotes}
           onChange={(e) => setLightsNotes(e.target.value)}
           placeholder="Notes for the lighting crew (cues, colors, effects...)"
+          className="min-h-[80px] bg-secondary border-border focus:border-primary focus:ring-primary resize-none"
+          rows={2}
+        />
+      </div>
+
+      {/* Notes */}
+      <div className="space-y-2">
+        <Label
+          htmlFor="notes"
+          className="text-sm font-medium text-foreground flex items-center gap-1.5"
+        >
+          <FileText className="w-4 h-4 text-muted-foreground" />
+          Notes
+          <span className="text-muted-foreground font-normal">(optional)</span>
+        </Label>
+        <Textarea
+          id="notes"
+          value={notes}
+          onChange={(e) => setNotes(e.target.value)}
+          placeholder="Add any notes about this song..."
           className="min-h-[80px] bg-secondary border-border focus:border-primary focus:ring-primary resize-none"
           rows={2}
         />
