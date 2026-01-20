@@ -325,16 +325,9 @@ export default function Index() {
                 {/* Setlist Builder */}
                 {setlistSongs.length === 0 ? (
                   <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-border/60 py-10">
-                    <p className="mb-3 text-sm text-muted-foreground">
-                      Your setlist is empty
+                    <p className="text-sm text-muted-foreground">
+                      Your setlist is empty — use "Add Songs" above to get started
                     </p>
-                    <SongPicker
-                      songs={songs}
-                      setlistSongIds={activeSetlist.songIds}
-                      onAddSong={handleAddToSetlist}
-                      onRemoveSong={handleRemoveFromSetlist}
-                      lastSongInSetlist={null}
-                    />
                   </div>
                 ) : (
                   <SetlistBuilder
