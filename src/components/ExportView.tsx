@@ -263,10 +263,10 @@ export function ExportView({ setlist, songs }: ExportViewProps) {
         pdf.rect(margin - 2, yPos - 2, contentWidth + 4, rowHeight, "F");
       }
 
-      // Song number - large and bold
+      // Song number - bold, darker grey for visibility
       pdf.setFontSize(numberFontSize);
       pdf.setFont("helvetica", "bold");
-      pdf.setTextColor(100, 100, 100);
+      pdf.setTextColor(70, 70, 70);
       pdf.text(songNum, numCol, yPos + rowHeight * 0.65);
 
       // Short name (cue) - largest, boldest for quick stage reference
@@ -277,10 +277,10 @@ export function ExportView({ setlist, songs }: ExportViewProps) {
         pdf.text(shortName.toUpperCase(), shortNameCol, yPos + rowHeight * 0.65);
       }
 
-      // Full title - medium size
+      // Full title - bold and darker for low-light readability
       pdf.setFontSize(titleFontSize);
-      pdf.setFont("helvetica", "normal");
-      pdf.setTextColor(60, 60, 60);
+      pdf.setFont("helvetica", "bold");
+      pdf.setTextColor(40, 40, 40);
       const maxTitleWidth = keyCol - titleCol - 5;
       const titleText = pdf.splitTextToSize(song.title, maxTitleWidth)[0]; // Truncate if needed
       pdf.text(titleText, titleCol, yPos + rowHeight * 0.65);
@@ -291,10 +291,10 @@ export function ExportView({ setlist, songs }: ExportViewProps) {
       pdf.setTextColor(0, 0, 0);
       pdf.text(key, keyCol, yPos + rowHeight * 0.65);
 
-      // BPM - useful reference
+      // BPM - bold and darker for visibility
       pdf.setFontSize(metaFontSize);
-      pdf.setFont("helvetica", "normal");
-      pdf.setTextColor(100, 100, 100);
+      pdf.setFont("helvetica", "bold");
+      pdf.setTextColor(60, 60, 60);
       pdf.text(bpm, bpmCol, yPos + rowHeight * 0.65, { align: "right" });
 
       yPos += rowHeight;
@@ -310,21 +310,31 @@ export function ExportView({ setlist, songs }: ExportViewProps) {
     yPos += 8;
 
     // Total runtime and song count - prominent
+    // If there's a footer logo, position text to the left to make room
+    const logoSize = 16;
+    const hasLogo = !!settings.footerLogo;
+
     pdf.setFontSize(16);
     pdf.setFont("helvetica", "bold");
     pdf.setTextColor(0, 0, 0);
     const totalText = `${orderedSongs.length} SONGS  •  ${formatDuration(totalSeconds)} TOTAL`;
-    pdf.text(totalText, pageWidth / 2, yPos + 4, { align: "center" });
 
-    // Footer logo (bottom right, square 1:1)
+    if (hasLogo) {
+      // Left-align text when logo present
+      pdf.text(totalText, margin, yPos + 4);
+    } else {
+      // Center text when no logo
+      pdf.text(totalText, pageWidth / 2, yPos + 4, { align: "center" });
+    }
+
+    // Footer logo (right side, inline with total info)
     if (settings.footerLogo) {
       try {
-        const logoSize = 18;
         pdf.addImage(
           settings.footerLogo,
           "PNG",
           pageWidth - margin - logoSize,
-          pageHeight - margin - logoSize,
+          yPos - 2,
           logoSize,
           logoSize
         );
@@ -555,7 +565,7 @@ export function ExportView({ setlist, songs }: ExportViewProps) {
                 )}
               >
                 {/* Number */}
-                <span className="w-5 text-sm font-bold text-gray-400 shrink-0">
+                <span className="w-5 text-sm font-bold text-gray-500 shrink-0">
                   {index + 1}
                 </span>
                 {/* Short name */}
@@ -563,7 +573,7 @@ export function ExportView({ setlist, songs }: ExportViewProps) {
                   {shortName}
                 </span>
                 {/* Title */}
-                <span className="flex-1 text-xs text-gray-600 truncate">
+                <span className="flex-1 text-xs font-bold text-gray-700 truncate">
                   {song.title}
                 </span>
                 {/* Key */}
@@ -571,7 +581,7 @@ export function ExportView({ setlist, songs }: ExportViewProps) {
                   {key}
                 </span>
                 {/* BPM */}
-                <span className="w-8 text-xs text-gray-400 text-right shrink-0">
+                <span className="w-8 text-xs font-bold text-gray-500 text-right shrink-0">
                   {song.bpm}
                 </span>
               </div>
