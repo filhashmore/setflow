@@ -158,7 +158,7 @@ export default function Index() {
                 )}
               >
                 <Library className="h-4 w-4" />
-                <span className="hidden xs:inline">Library</span>
+                Library
               </Button>
               <Button
                 variant={currentView === 'setlist' ? 'secondary' : 'ghost'}
@@ -170,7 +170,7 @@ export default function Index() {
                 )}
               >
                 <ListMusic className="h-4 w-4" />
-                <span className="hidden xs:inline">Setlist</span>
+                Setlist
                 {activeSetlist && activeSetlist.songIds.length > 0 && (
                   <span className="min-w-[1.25rem] h-5 rounded-full bg-primary/20 text-primary text-xs font-semibold flex items-center justify-center">
                     {activeSetlist.songIds.length}

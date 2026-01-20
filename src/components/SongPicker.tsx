@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react';
-import { Drawer, DrawerContent, DrawerHeader, DrawerTitle, DrawerTrigger } from '@/components/ui/drawer';
+import { Drawer, DrawerContent, DrawerHeader, DrawerTitle, DrawerTrigger, DrawerClose } from '@/components/ui/drawer';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -234,19 +234,23 @@ export function SongPicker({
   }
 
   return (
-    <Drawer open={open} onOpenChange={setOpen}>
+    <Drawer open={open} onOpenChange={setOpen} dismissible={false}>
       <DrawerTrigger asChild>
         <Button size="sm" className="gap-1.5 h-9 shadow-sm">
           <Plus className="h-4 w-4" />
           Add Songs
         </Button>
       </DrawerTrigger>
-      <DrawerContent className="h-[85vh] max-h-[85vh]">
-        <DrawerHeader className="border-b border-border pb-3">
+      <DrawerContent className="h-[85vh] max-h-[85vh]" onPointerDownOutside={(e) => e.preventDefault()}>
+        <DrawerHeader className="border-b border-border pb-3 relative">
           <DrawerTitle className="flex items-center gap-2">
             <ListMusic className="h-5 w-5 text-primary" />
             Add Songs to Setlist
           </DrawerTitle>
+          <DrawerClose className="absolute right-4 top-1/2 -translate-y-1/2 rounded-sm opacity-70 hover:opacity-100">
+            <X className="h-5 w-5" />
+            <span className="sr-only">Close</span>
+          </DrawerClose>
         </DrawerHeader>
         {pickerContent}
       </DrawerContent>
