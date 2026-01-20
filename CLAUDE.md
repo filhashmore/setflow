@@ -1,48 +1,46 @@
-# Vibecode Workspace
+# SetFlow
 
-This workspace contains a mobile app and backend server.
+Setlist builder app for musicians and production managers. Create song libraries, build setlists with drag-and-drop, get flow warnings (key clashes, energy drops), and export to PDF.
 
-<projects>
-  webapp/    — React app (port 8000, environment variable VITE_BASE_URL)
-  backend/   — Hono API server (port 3000, environment variable VITE_BACKEND_URL)
-</projects>
+## Tech Stack
 
-<agents>
-  Use subagents for project-specific work:
-  - backend-developer: Changes to the backend API
-  - webapp-developer: Changes to the webapp frontend
+- **Frontend:** React 18, Vite 5, TypeScript
+- **Styling:** Tailwind CSS, shadcn/ui, Framer Motion
+- **Icons:** Lucide React
+- **State:** localStorage (no backend needed)
+- **Deployment:** Vercel
 
-  Each agent reads its project's CLAUDE.md for detailed instructions.
-</agents>
+## Development
 
-<coordination>
-  When a feature needs both frontend and backend:
-  1. Define Zod schemas for request/response in backend/src/types.ts (shared contracts)
-  2. Implement backend route using the schemas
-  3. Test backend with cURL (use $BACKEND_URL, never localhost)
-  4. Implement frontend, importing schemas from backend/src/types.ts to parse responses
-  5. Test the integration
+```bash
+npm install
+npm run dev      # Start dev server on http://localhost:5173
+npm run build    # Production build
+npm run preview  # Preview production build
+```
 
-  <shared_types>
-    All API contracts live in backend/src/types.ts as Zod schemas.
-    Both backend and frontend can import from this file — single source of truth.
-  </shared_types>
-</coordination>
+## Project Structure
 
-<skills>
-  Shared skills in .claude/skills/:
-  - database-auth: Set up Prisma + Better Auth for user accounts and data persistence
-  - ai-apis-like-chatgpt: Use this skill when the user asks you to make an app that requires an AI API.
+```
+src/
+├── components/     # React components
+│   ├── ui/         # shadcn/ui components
+│   └── ...         # App-specific components
+├── lib/            # Utilities, types, store
+├── pages/          # Page components
+└── hooks/          # Custom hooks
+```
 
-  Frontend only skills:
-  - frontend-app-design: Create distinctive, production-grade web interfaces using React, Tailwind, and shadcn/ui. Use when building pages, components, or styling any web UI.
-</skills>
+## Key Features
 
-<environment>
-  System manages git and dev servers. DO NOT manage these.
-  The user views the app through Vibecode Mobile App with a webview preview or Vibecode Web App with an iframe preview.
-  The user cannot see code or terminal. Do everything for them.
-  Write one-off scripts to achieve tasks the user asks for.
-  Communicate in an easy to understand manner for non-technical users.
-  Be concise and don't talk too much.
-</environment>
+- **Song Library:** Add songs with title, artist, duration, BPM, key, energy level
+- **Setlist Builder:** Drag-and-drop reordering
+- **Flow Warnings:** Detects key clashes, energy drops, slow sequences
+- **Time Tracking:** Target time vs actual with changeover buffer
+- **Export:** PDF export for stage/FOH use
+
+## Notes
+
+- All data persists in localStorage (`setflow-songs`, `setflow-setlists`)
+- No authentication or backend required
+- Mobile-responsive design
