@@ -153,7 +153,8 @@ export function ExportView({ setlist, songs }: ExportViewProps) {
 
     const pageWidth = pdf.internal.pageSize.getWidth();
     const pageHeight = pdf.internal.pageSize.getHeight();
-    const margin = 20;
+    const margin = 15;
+    const contentWidth = pageWidth - margin * 2;
     let yPos = margin;
 
     // Header logo or text
@@ -165,9 +166,8 @@ export function ExportView({ setlist, songs }: ExportViewProps) {
           img.onload = resolve;
         });
 
-        // Calculate dimensions to fit header (max width 120mm, max height 30mm)
-        const maxWidth = 120;
-        const maxHeight = 30;
+        const maxWidth = 140;
+        const maxHeight = 25;
         const ratio = Math.min(maxWidth / img.width, maxHeight / img.height);
         const imgWidth = img.width * ratio;
         const imgHeight = img.height * ratio;
@@ -180,79 +180,146 @@ export function ExportView({ setlist, songs }: ExportViewProps) {
           imgWidth,
           imgHeight
         );
-        yPos += imgHeight + 10;
+        yPos += imgHeight + 6;
       } catch {
-        // Fallback to text if image fails
-        pdf.setFontSize(24);
+        pdf.setFontSize(28);
         pdf.setFont("helvetica", "bold");
-        pdf.text(settings.bandName || setlist.name, pageWidth / 2, yPos + 10, { align: "center" });
-        yPos += 20;
+        pdf.text(settings.bandName || setlist.name, pageWidth / 2, yPos + 8, { align: "center" });
+        yPos += 14;
       }
     } else if (settings.bandName) {
-      pdf.setFontSize(24);
+      pdf.setFontSize(28);
       pdf.setFont("helvetica", "bold");
-      pdf.text(settings.bandName.toUpperCase(), pageWidth / 2, yPos + 10, { align: "center" });
-      yPos += 15;
+      pdf.text(settings.bandName.toUpperCase(), pageWidth / 2, yPos + 8, { align: "center" });
+      yPos += 14;
     }
 
-    // Subtitle
+    // Subtitle (venue, date, etc.)
     if (settings.subtitle) {
-      pdf.setFontSize(12);
+      pdf.setFontSize(14);
       pdf.setFont("helvetica", "normal");
-      pdf.text(settings.subtitle, pageWidth / 2, yPos + 5, { align: "center" });
-      yPos += 12;
+      pdf.text(settings.subtitle, pageWidth / 2, yPos + 4, { align: "center" });
+      yPos += 10;
     }
 
-    // Setlist name
-    pdf.setFontSize(14);
+    // Setlist name with thick divider
+    pdf.setFontSize(18);
     pdf.setFont("helvetica", "bold");
-    pdf.text(setlist.name, pageWidth / 2, yPos + 8, { align: "center" });
-    yPos += 15;
+    pdf.text(setlist.name, pageWidth / 2, yPos + 6, { align: "center" });
+    yPos += 12;
 
-    // Divider line
-    pdf.setLineWidth(0.5);
-    pdf.line(margin, yPos, pageWidth - margin, yPos);
-    yPos += 10;
-
-    // Songs - centered format: short name - song name - key
-    pdf.setFontSize(12);
-    pdf.setFont("helvetica", "normal");
-
-    orderedSongs.forEach((song) => {
-      if (yPos > pageHeight - 40) {
-        pdf.addPage();
-        yPos = margin;
-      }
-
-      const shortName = song.shortName || "";
-      const key = formatFullKey(song.musicalKey, song.keyMode);
-
-      let songLine: string;
-      if (shortName) {
-        songLine = `${shortName}  —  ${song.title}  —  ${key}`;
-      } else {
-        songLine = `${song.title}  —  ${key}`;
-      }
-
-      pdf.text(songLine, pageWidth / 2, yPos, { align: "center" });
-      yPos += 8;
-    });
-
-    // Bottom divider
-    yPos += 5;
-    pdf.setLineWidth(0.5);
+    // Thick header divider
+    pdf.setLineWidth(1.5);
+    pdf.setDrawColor(0, 0, 0);
     pdf.line(margin, yPos, pageWidth - margin, yPos);
     yPos += 8;
 
-    // Total runtime - centered
-    pdf.setFontSize(10);
+    // Calculate row height based on number of songs to maximize use of page
+    const footerSpace = 25; // Space for total time at bottom
+    const availableHeight = pageHeight - yPos - footerSpace;
+    const songCount = orderedSongs.length;
+    const maxRowHeight = 18; // Maximum comfortable row height
+    const minRowHeight = 12; // Minimum readable row height
+    const rowHeight = Math.max(minRowHeight, Math.min(maxRowHeight, availableHeight / songCount));
+
+    // Determine font sizes based on row height
+    const numberFontSize = Math.min(24, rowHeight * 1.2);
+    const shortNameFontSize = Math.min(22, rowHeight * 1.1);
+    const titleFontSize = Math.min(16, rowHeight * 0.85);
+    const metaFontSize = Math.min(12, rowHeight * 0.65);
+
+    // Column positions for stage-readable layout
+    const numCol = margin; // Song number
+    const shortNameCol = margin + 12; // Short name (cue name)
+    const titleCol = margin + 55; // Full title
+    const keyCol = pageWidth - margin - 35; // Key
+    const bpmCol = pageWidth - margin - 12; // BPM
+
+    // Songs - large, bold, left-aligned for stage reading
+    orderedSongs.forEach((song, index) => {
+      // Check if we need a new page
+      if (yPos > pageHeight - footerSpace - rowHeight) {
+        pdf.addPage();
+        yPos = margin;
+
+        // Add continuation header
+        pdf.setFontSize(12);
+        pdf.setFont("helvetica", "italic");
+        pdf.text(`${setlist.name} (continued)`, pageWidth / 2, yPos + 4, { align: "center" });
+        yPos += 10;
+        pdf.setLineWidth(0.5);
+        pdf.line(margin, yPos, pageWidth - margin, yPos);
+        yPos += 6;
+      }
+
+      const songNum = (index + 1).toString();
+      const shortName = song.shortName || "";
+      const key = song.musicalKey + (song.keyMode === "Minor" ? "m" : "");
+      const bpm = song.bpm.toString();
+
+      // Alternating row background for readability
+      if (index % 2 === 0) {
+        pdf.setFillColor(245, 245, 245);
+        pdf.rect(margin - 2, yPos - 2, contentWidth + 4, rowHeight, "F");
+      }
+
+      // Song number - large and bold
+      pdf.setFontSize(numberFontSize);
+      pdf.setFont("helvetica", "bold");
+      pdf.setTextColor(100, 100, 100);
+      pdf.text(songNum, numCol, yPos + rowHeight * 0.65);
+
+      // Short name (cue) - largest, boldest for quick stage reference
+      pdf.setFontSize(shortNameFontSize);
+      pdf.setFont("helvetica", "bold");
+      pdf.setTextColor(0, 0, 0);
+      if (shortName) {
+        pdf.text(shortName.toUpperCase(), shortNameCol, yPos + rowHeight * 0.65);
+      }
+
+      // Full title - medium size
+      pdf.setFontSize(titleFontSize);
+      pdf.setFont("helvetica", "normal");
+      pdf.setTextColor(60, 60, 60);
+      const maxTitleWidth = keyCol - titleCol - 5;
+      const titleText = pdf.splitTextToSize(song.title, maxTitleWidth)[0]; // Truncate if needed
+      pdf.text(titleText, titleCol, yPos + rowHeight * 0.65);
+
+      // Key - prominent for musicians
+      pdf.setFontSize(metaFontSize + 2);
+      pdf.setFont("helvetica", "bold");
+      pdf.setTextColor(0, 0, 0);
+      pdf.text(key, keyCol, yPos + rowHeight * 0.65);
+
+      // BPM - useful reference
+      pdf.setFontSize(metaFontSize);
+      pdf.setFont("helvetica", "normal");
+      pdf.setTextColor(100, 100, 100);
+      pdf.text(bpm, bpmCol, yPos + rowHeight * 0.65, { align: "right" });
+
+      yPos += rowHeight;
+    });
+
+    // Bottom section
+    yPos += 4;
+
+    // Final divider
+    pdf.setLineWidth(1.5);
+    pdf.setDrawColor(0, 0, 0);
+    pdf.line(margin, yPos, pageWidth - margin, yPos);
+    yPos += 8;
+
+    // Total runtime and song count - prominent
+    pdf.setFontSize(16);
     pdf.setFont("helvetica", "bold");
-    pdf.text(`Total: ${formatDuration(totalSeconds)}`, pageWidth / 2, yPos, { align: "center" });
+    pdf.setTextColor(0, 0, 0);
+    const totalText = `${orderedSongs.length} SONGS  •  ${formatDuration(totalSeconds)} TOTAL`;
+    pdf.text(totalText, pageWidth / 2, yPos + 4, { align: "center" });
 
     // Footer logo (bottom right, square 1:1)
     if (settings.footerLogo) {
       try {
-        const logoSize = 20; // 20mm square
+        const logoSize = 18;
         pdf.addImage(
           settings.footerLogo,
           "PNG",
@@ -447,71 +514,85 @@ export function ExportView({ setlist, songs }: ExportViewProps) {
         </div>
       </div>
 
-      {/* Preview */}
-      <div className="p-6 rounded-lg bg-white text-black border border-border">
-        <div className="text-center space-y-2 mb-6">
+      {/* Preview - Stage-readable format */}
+      <div className="p-4 rounded-lg bg-white text-black border border-border overflow-hidden">
+        {/* Header */}
+        <div className="text-center space-y-1 mb-3">
           {settings.useTextHeader && settings.bandName && (
-            <h2 className="text-xl font-bold uppercase tracking-wide">
+            <h2 className="text-lg font-bold uppercase tracking-wide">
               {settings.bandName}
             </h2>
           )}
           {!settings.useTextHeader && settings.headerLogo && (
-            <div className="flex justify-center mb-2">
+            <div className="flex justify-center mb-1">
               <img
                 src={settings.headerLogo}
                 alt="Header"
-                className="h-12 object-contain"
+                className="h-8 object-contain"
               />
             </div>
           )}
           {settings.subtitle && (
-            <p className="text-sm text-gray-600">{settings.subtitle}</p>
+            <p className="text-xs text-gray-600">{settings.subtitle}</p>
           )}
-          <h3 className="text-lg font-semibold">{setlist.name}</h3>
-          <div className="w-full h-px bg-gray-300 mt-2" />
+          <h3 className="text-sm font-semibold">{setlist.name}</h3>
         </div>
 
-        <div className="space-y-1.5 text-center">
-          {orderedSongs.map((song) => {
+        {/* Thick divider */}
+        <div className="w-full h-0.5 bg-black mb-2" />
+
+        {/* Song list - table format */}
+        <div className="space-y-0">
+          {orderedSongs.map((song, index) => {
             const shortName = song.shortName || "";
-            const key = formatFullKey(song.musicalKey, song.keyMode);
+            const key = song.musicalKey + (song.keyMode === "Minor" ? "m" : "");
             return (
-              <p key={song.id} className="text-sm">
-                {shortName ? (
-                  <>
-                    <span className="font-medium">{shortName}</span>
-                    <span className="text-gray-400 mx-2">—</span>
-                    {song.title}
-                    <span className="text-gray-400 mx-2">—</span>
-                    <span className="text-gray-600">{key}</span>
-                  </>
-                ) : (
-                  <>
-                    {song.title}
-                    <span className="text-gray-400 mx-2">—</span>
-                    <span className="text-gray-600">{key}</span>
-                  </>
+              <div
+                key={song.id}
+                className={cn(
+                  "flex items-center gap-2 py-1.5 px-1",
+                  index % 2 === 0 && "bg-gray-100"
                 )}
-              </p>
+              >
+                {/* Number */}
+                <span className="w-5 text-sm font-bold text-gray-400 shrink-0">
+                  {index + 1}
+                </span>
+                {/* Short name */}
+                <span className="w-16 text-sm font-bold uppercase truncate shrink-0">
+                  {shortName}
+                </span>
+                {/* Title */}
+                <span className="flex-1 text-xs text-gray-600 truncate">
+                  {song.title}
+                </span>
+                {/* Key */}
+                <span className="w-8 text-xs font-bold text-right shrink-0">
+                  {key}
+                </span>
+                {/* BPM */}
+                <span className="w-8 text-xs text-gray-400 text-right shrink-0">
+                  {song.bpm}
+                </span>
+              </div>
             );
           })}
         </div>
 
-        <div className="mt-4 pt-2 border-t border-gray-300 text-center">
-          <p className="text-xs font-medium text-gray-600">
-            Total: {formatDuration(totalSeconds)}
+        {/* Footer */}
+        <div className="w-full h-0.5 bg-black mt-2 mb-2" />
+        <div className="flex items-center justify-between">
+          <p className="text-xs font-bold">
+            {orderedSongs.length} SONGS • {formatDuration(totalSeconds)} TOTAL
           </p>
-        </div>
-
-        {settings.footerLogo && (
-          <div className="flex justify-end mt-4">
+          {settings.footerLogo && (
             <img
               src={settings.footerLogo}
               alt="Footer"
-              className="w-10 h-10 object-contain"
+              className="w-8 h-8 object-contain"
             />
-          </div>
-        )}
+          )}
+        </div>
       </div>
 
       {/* Export buttons */}
