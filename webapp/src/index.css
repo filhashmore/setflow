@@ -1,0 +1,228 @@
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Outfit:wght@300;400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* SetFlow Design System - Dark mode by default for backstage use */
+
+@layer base {
+  :root {
+    --background: 240 10% 4%;
+    --foreground: 0 0% 96%;
+
+    --card: 240 8% 7%;
+    --card-foreground: 0 0% 96%;
+
+    --popover: 240 8% 8%;
+    --popover-foreground: 0 0% 96%;
+
+    /* Deep purple primary - music-themed accent */
+    --primary: 263 70% 58%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 240 6% 12%;
+    --secondary-foreground: 0 0% 90%;
+
+    --muted: 240 6% 14%;
+    --muted-foreground: 240 5% 50%;
+
+    /* Electric violet accent */
+    --accent: 270 90% 65%;
+    --accent-foreground: 0 0% 100%;
+
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 0 0% 100%;
+
+    /* Status colors */
+    --success: 142 71% 45%;
+    --success-foreground: 0 0% 100%;
+    --warning: 38 92% 50%;
+    --warning-foreground: 0 0% 0%;
+
+    --border: 240 6% 18%;
+    --input: 240 6% 14%;
+    --ring: 263 70% 58%;
+
+    --radius: 0.625rem;
+
+    /* Gradient accents */
+    --gradient-start: 263 70% 58%;
+    --gradient-end: 270 90% 65%;
+
+    --sidebar-background: 240 8% 6%;
+    --sidebar-foreground: 0 0% 96%;
+    --sidebar-primary: 263 70% 58%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 240 6% 12%;
+    --sidebar-accent-foreground: 0 0% 96%;
+    --sidebar-border: 240 6% 16%;
+    --sidebar-ring: 263 70% 58%;
+  }
+
+  .dark {
+    --background: 240 10% 4%;
+    --foreground: 0 0% 96%;
+
+    --card: 240 8% 7%;
+    --card-foreground: 0 0% 96%;
+
+    --popover: 240 8% 8%;
+    --popover-foreground: 0 0% 96%;
+
+    --primary: 263 70% 58%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 240 6% 12%;
+    --secondary-foreground: 0 0% 90%;
+
+    --muted: 240 6% 14%;
+    --muted-foreground: 240 5% 50%;
+
+    --accent: 270 90% 65%;
+    --accent-foreground: 0 0% 100%;
+
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 0 0% 100%;
+
+    --success: 142 71% 45%;
+    --success-foreground: 0 0% 100%;
+    --warning: 38 92% 50%;
+    --warning-foreground: 0 0% 0%;
+
+    --border: 240 6% 18%;
+    --input: 240 6% 14%;
+    --ring: 263 70% 58%;
+
+    --sidebar-background: 240 8% 6%;
+    --sidebar-foreground: 0 0% 96%;
+    --sidebar-primary: 263 70% 58%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 240 6% 12%;
+    --sidebar-accent-foreground: 0 0% 96%;
+    --sidebar-border: 240 6% 16%;
+    --sidebar-ring: 263 70% 58%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  html {
+    @apply antialiased;
+  }
+
+  body {
+    @apply bg-background text-foreground font-outfit;
+  }
+
+  /* Custom scrollbar for dark theme */
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  ::-webkit-scrollbar-track {
+    @apply bg-background;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    @apply bg-muted rounded-full;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-muted-foreground/30;
+  }
+}
+
+@layer components {
+  /* Glass card effect */
+  .glass-card {
+    @apply bg-card/80 backdrop-blur-sm border border-border/50;
+  }
+
+  /* Glow effect for interactive elements */
+  .glow-primary {
+    box-shadow: 0 0 20px -5px hsl(var(--primary) / 0.4);
+  }
+
+  .glow-accent {
+    box-shadow: 0 0 20px -5px hsl(var(--accent) / 0.4);
+  }
+
+  /* Status indicator pills */
+  .status-good {
+    @apply bg-emerald-500/15 text-emerald-400 border-emerald-500/30;
+  }
+
+  .status-warning {
+    @apply bg-amber-500/15 text-amber-400 border-amber-500/30;
+  }
+
+  .status-danger {
+    @apply bg-red-500/15 text-red-400 border-red-500/30;
+  }
+
+  /* Drag handle styling */
+  .drag-handle {
+    @apply cursor-grab active:cursor-grabbing;
+  }
+
+  /* Energy level visualization */
+  .energy-bar {
+    @apply h-1 rounded-full bg-gradient-to-r from-primary to-accent;
+  }
+}
+
+@layer utilities {
+  /* Mono font for timing displays */
+  .font-mono-display {
+    @apply font-mono tracking-tight tabular-nums;
+  }
+
+  /* Gradient text */
+  .gradient-text {
+    background: linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--accent)) 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  /* Touch-friendly sizing */
+  .touch-target {
+    @apply min-h-[44px] min-w-[44px];
+  }
+
+  /* Safe area insets for mobile devices (notches, home indicator, etc.) */
+  .safe-area-inset {
+    padding-left: env(safe-area-inset-left);
+    padding-right: env(safe-area-inset-right);
+  }
+
+  .safe-top {
+    padding-top: env(safe-area-inset-top);
+  }
+
+  .safe-bottom {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+
+  /* Animation for fade-in effect */
+  .animate-fade-in {
+    animation: fade-in 0.3s ease-out forwards;
+    opacity: 0;
+  }
+
+  @keyframes fade-in {
+    from {
+      opacity: 0;
+      transform: translateY(8px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+}
